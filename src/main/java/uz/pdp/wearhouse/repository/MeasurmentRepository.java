@@ -7,4 +7,5 @@ import uz.pdp.wearhouse.entity.Measurement;
 @Repository
 public interface MeasurmentRepository extends JpaRepository<Measurement, Integer> {
     boolean existsByName(String name);
+    boolean findByIdAndActive(Integer id, boolean active);
 }

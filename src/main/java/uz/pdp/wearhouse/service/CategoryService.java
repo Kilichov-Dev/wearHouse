@@ -29,13 +29,17 @@ public class CategoryService {
             if (!optionalCategory.isPresent()) {
                 return new Result("Bunday kategorya mavjud emas!", false);
             }
+            boolean exists1 = categoryRepository.existsByIdAndActive(categoryDto.getParentCategoryId(), false);
+            if (exists1) {
+                category.setActive(false);
+            }
             category.setParentCategory(optionalCategory.get());
         }
         categoryRepository.save(category);
         return new Result("Muvaffiqayatli saqlandi!", true);
     }
 
-    public Result editCategory( Integer id, CategoryDto categoryDto) {
+    public Result editCategory(Integer id, CategoryDto categoryDto) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         if (optionalCategory.isPresent()) {
             Category category = optionalCategory.get();
@@ -47,6 +51,10 @@ public class CategoryService {
                 if (!optionalCategory1.isPresent()) {
                     return new Result("Bunday parent kategory mavjud emas!", false);
                 }
+                boolean exists1 = categoryRepository.existsByIdAndActive(categoryDto.getParentCategoryId(), false);
+                if (exists1) {
+                    category.setActive(false);
+                }
                 category.setParentCategory(optionalCategory1.get());
             }
             categoryRepository.save(category);
@@ -55,7 +63,7 @@ public class CategoryService {
         return new Result("Kategory topilmadi!", false);
     }
 
-    public Result deleteCategory( Integer id) {
+    public Result deleteCategory(Integer id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         if (optionalCategory.isPresent()) {
             categoryRepository.deleteById(id);

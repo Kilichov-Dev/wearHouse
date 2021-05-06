@@ -2,8 +2,6 @@ package uz.pdp.wearhouse.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import uz.pdp.wearhouse.entity.Attachments;
 import uz.pdp.wearhouse.entity.Category;
 import uz.pdp.wearhouse.entity.Measurement;
@@ -15,7 +13,6 @@ import uz.pdp.wearhouse.repository.CategoryRepository;
 import uz.pdp.wearhouse.repository.MeasurmentRepository;
 import uz.pdp.wearhouse.repository.ProductRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,8 +31,7 @@ public class ProductService {
     AttachmentRepository attachmentRepository;
 
 
-
-    public Result editProduct( Integer id,  ProductDto productDto) {
+    public Result editProduct(Integer id, ProductDto productDto) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
 
@@ -58,18 +54,24 @@ public class ProductService {
             }
 
             Optional<Measurement> optionalMeasurement = measurmentRepository.findById(productDto.getMeasurementId());
-
             if (!optionalMeasurement.isPresent()) {
                 return new Result("Bunday o'lchov birlik yo'q", false);
             }
 
+
             Product product = optionalProduct.get();
             product.setName(product.getName());
-            product.setCode("1");
             product.setPhoto(optionalAttachments.get());
             product.setCategory(optionalCategory.get());
             product.setMeasurement(optionalMeasurement.get());
             productRepository.save(product);
+
+            boolean byIdAndActive = measurmentRepository.findByIdAndActive(productDto.getMeasurementId(), false);
+
+            if (byIdAndActive) {
+                product.setActive(false);
+                return new Result("This unit of measurement is not active", false);
+            }
             return new Result("Product editing!", true);
 
         }
@@ -100,12 +102,18 @@ public class ProductService {
         product.setPhoto(optionalAttachments.get());
         product.setCategory(optionalCategory.get());
         product.setMeasurement(optionalMeasurement.get());
+        boolean byIdAndActive = measurmentRepository.findByIdAndActive(productDto.getMeasurementId(), false);
+
+        if (byIdAndActive) {
+            product.setActive(false);
+            return new Result("This unit of measurement is not active", false);
+        }
         productRepository.save(product);
         return new Result("Product added!", true);
 
     }
 
-    public Result deleteProduct( Integer id) {
+    public Result deleteProduct(Integer id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             productRepository.deleteById(id);

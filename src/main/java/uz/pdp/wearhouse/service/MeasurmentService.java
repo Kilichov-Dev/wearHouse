@@ -17,7 +17,6 @@ public class MeasurmentService {
     MeasurmentRepository measurmentRepository;
 
 
-
     public Result addMeasurementService(Measurement measurement) {
         boolean exists = measurmentRepository.existsByName(measurement.getName());
         if (exists) {
@@ -34,15 +33,11 @@ public class MeasurmentService {
         if (!optionalMeasurement.isPresent()) {
             return new Result("Masurement not found!", false);
         }
-
-
         boolean exists = measurmentRepository.existsByName(measurement.getName());
         if (exists) {
             return new Result("Bunday o'lchov birlik mavjud!", false);
         }
-
         measurement1.setName(measurement.getName());
-
         measurmentRepository.save(measurement1);
         return new Result("Measurement editing!", true);
     }
